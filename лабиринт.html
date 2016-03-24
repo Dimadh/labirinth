@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+  <title>Атрибут id</title>
+
+  
+<body>
+<input id = "easy"  type="button" value="easy" >
+<input id = "run"  type="button" value="GO" onClick="setBlankAsDeadblockRec(1,1)" >
+
+
+<script>
+var mat_arr = RandomMine();
+//print(mat_arr);
+
+function cell(x,y){
+	this.x = x;
+	this.y = y;
+	this.val = 0;
+	this.Visited = 0;
+}
+function wall(x,y){
+	this.x = x;
+	this.y = y;
+	this.val = 1;
+}
+function cellString(){
+	this.cell = new Array();
+	this.size = 0;
+}
+
+
+function RandomMine(){
+		
+	var i,n = 15 ,str = '', j ,bol = true;
+	//var max =25, min = 1;
+	
+	var matrix = new Array(n);
+	
+	for(var i = 0; i < matrix.length; i++)
+		matrix[i] = new Array(n);
+		
+		for(var row = 0; row < matrix.length; row++) {
+			for(var col = 0; col < matrix[row].length; col++) {
+				if((row % 2 != 0  && col % 2 != 0) && (row < n-1 && col < n-1)){
+					matrix[row][col] = new cell(row,col);
+					//str +=  ' ' +  matrix[row][col];
+					//////alert(str)
+				}			
+				else{
+					matrix[row][col] = new wall(row,col);
+					//str += ' ' + matrix[row][col];	
+				}	
+			}
+			//str = str + '\n'
+
+
+		}	
+	//////alert(str + '\n');
+	str = '';	
+		
+	////alert(matrix.length)	
+
+	//////alert(matrix)
+	//var count_val =0;
+	//for(var j = 0; j < matrix.length; j++) {
+	//  for(n = 0; n < matrix[j].length; n++) {
+	//	count_val++;
+	//	if(matrix[j][n] == 1){
+	//			var elem = document.getElementById("elem" + count_val);
+	//			////alert(elem.id);		
+	//	}
+	//  }
+	//}	
+	return matrix;
+}
+
+function print(matrix){
+		var str = '';
+		for(var row = 0; row < matrix.length; row++) {
+			for(var col = 0; col < matrix[row].length; col++) {
+				if((row % 2 != 0  && col % 2 != 0) && (row < matrix.length-1 && col < matrix[row].length-1)){
+					
+					str +=  ' ' +  matrix[row][col].val;
+					//////alert(str)
+				}			
+				else{					
+					str += ' ' + matrix[row][col].val;	
+				}	
+			}
+			str = str + '\n'
+
+
+		}	
+	alert(str + '\n');
+	str = '';
+
+}
+
+getNeighbours(15,15,mat_arr,mat_arr[2][3]);
+
+function getNeighbours(width, height, maze, c){
+    var distance = 2;
+    var x = c.x;
+    var y = c.y;
+    var up = {x:x, y: y - distance};
+    var rt = {x:x + distance,y:  y};
+    var dw = {x:x,y:  y + distance};
+    var lt = {x:x - distance,y:  y};
+    var d = new Array(4); 
+	d  = [dw, rt, up, lt];
+    var size = 0;
+	var cells = new cellString();
+	cells.cell = new Array();
+	for(i = 0; i < 4; i++){ //для каждого направдения
+        if(d[i].x > 0 && d[i].x < width && d[i].y > 0 && d[i].y < height){ //если не выходит за границы лабиринта
+			var mazeCellCurrent = maze[d[i].y][d[i].x];
+			//////alert("a")
+			//////alert(mazeCellCurrent.val);
+			var cellCurrent = d[i];
+            if(mazeCellCurrent.val != 1 && mazeCellCurrent.Visited != 1){ //и не посещена\является стеной
+                cells.cell[size] = cellCurrent; //записать в массив;
+                size++;
+			//////alert("size")	
+			//////alert(size);	
+            }
+        }
+    }
+    cells.size = size;
+    return cells;
+}
+
+
+//removeWall(mat_arr[1][1],mat_arr[1][3],mat_arr)
+//print(mat_arr);
+function removeWall(first, second, maze){
+    var xDiff = second.x - first.x;
+    var yDiff = second.y - first.y;
+    var addX, addY;
+    var target= {x:0,y:0};
+
+    addX = (xDiff != 0) ? (xDiff / Math.abs(xDiff)) : 0;
+    addY = (yDiff != 0) ? (yDiff / Math.abs(yDiff)) : 0;
+
+    target.x = first.x + addX; //координаты стенки
+    target.y = first.y + addY;
+	//////alert(target.x)
+	//////alert(target.y)
+	
+    maze[target.y][target.x].val = 0;
+	maze[target.y][target.x].Visited = 1; 
+    return maze;
+}
+create_mize(mat_arr);
+
+// использование Math.round() даст неравномерное распределение!
+function getRandomInt(min, max)
+{
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+function create_mize(matrix){
+var startCell = matrix[1][1]
+var i = 70;
+var currentCell = startCell; // выбраная
+var neighbourCell;			 // соседняя
+var stack = [];
+do{
+    var Neighbours = getNeighbours(15, 15, matrix, currentCell);
+	 //////alert(Neighbours.size);
+	 if(Neighbours.size != 0){ //если у клетки есть непосещенные соседи
+		randNum  = getRandomInt(0, Neighbours.size-1);
+        neighbourCell = Neighbours.cell[randNum]; //выбираем случайного соседа
+		//////alert(neighbourCell.val);
+		//////alert(neighbourCell.x)
+		//////alert(neighbourCell.y)
+		//////alert(currentCell.val)
+		stack.push(currentCell);
+		//////alert(stack.pop().val);
+        //push(d.startPoint); //заносим текущую точку в стек
+        matrix = removeWall(currentCell, neighbourCell, matrix); //убираем стену между текущей и сосендней точками
+		matrix[neighbourCell.y][neighbourCell.x].Visited = 1;
+		matrix[startCell.y][startCell.x].Visited = 1;
+        //print(matrix);
+		currentCell = neighbourCell; //делаем соседнюю точку текущей и отмечаем ее посещенной
+        
+        //free(Neighbours.cell);
+	}else if(stack.length > 0){ //если нет соседей, возвращаемся на предыдущую точку
+        currentCell = stack.pop();
+		////alert('AaAAAAAAAA');
+		////alert(currentCell.x + ' ' + currentCell.y);
+    }
+	
+}
+while(i-- > 0);
+	
+}
+
+addAll("easy",15);
+
+var count_for_name = 0, count_row_mas = 1, count_col_mas, Mathrix_arr;
+function addAll(id_but,n){
+	
+	var docc = document.getElementById(id_but);
+	var div_id = document.getElementById("header_1");
+	var ger = function() {	
+	count_col_mas = 0
+	
+	while(count_col_mas++ < n){
+		count_row_mas = 0;
+		for(var i = 0; i < n; i++){
+
+		
+		  var theText = document.createElement('DIV');
+		 // ////alert("div sozdan");
+			//////alert(theText);
+			
+		  
+		  theText.style.width='15px';
+		  theText.style.height='15px';
+		  theText.style.position = 'relative';
+		  theText.style.border = '4px double black';
+
+		  theText.style.marginLeft = (23 * count_row_mas++) + 'px' ;
+		  if(i % n == 0){
+		  theText.style.marginTop = (0) + 'px' ;
+		  }	else
+		  theText.style.marginTop = (-23) + 'px' ;
+			//////alert(theText.style.marginTop);	
+
+		  theText.style.background='gray';
+		if(mat_arr[count_col_mas -1][i].val == 0){
+			theText.style.background='blue';
+		 }
+		  theText.idName='elem' + (count_for_name++);        // insertBefore
+		  //////alert(theText.idName);		  					//appendChild	
+		  this.parentNode.appendChild(theText,div_id);
+
+		}
+	//count_col_mas++;	
+	}
+	 Mathrix_arr = RandomMine(n);
+
+	
+}
+		
+	docc.onclick = ger;
+	
+	
+}
+
+
+
+function setBlankAsDeadblockRec(x,y){
+	var k = 0;
+	var kot = document.getElementsByTagName("DIV");
+	//alert(kot.length)
+	var queue = []
+	if (mat_arr[x][y].val == 0){
+				
+			  if (mat_arr[x-1][y].val == 1)  k =k+1;
+			  if (mat_arr[x][y-1].val == 1)  k =k+1;
+			  if (mat_arr[x+1][y].val == 1)  k =k+1;
+			  if (mat_arr[x][y+1].val == 1)  k =k+1;
+				
+			  if (k == 4){ 
+					mat_arr[x][y].val = -3;
+					alert();	
+				    kot[((x) * 15 + (y))].style.background='green';
+				}
+			  if (k > 0){
+				alert();
+				mat_arr[x][y].val = -3 ;
+				kot[((x) * 15 + (y))].style.background='green';
+																	
+				if (mat_arr[x-1][y].val == 0)  setBlankAsDeadblockRec(x-1,y);
+				if (mat_arr[x][y-1].val == 0)  setBlankAsDeadblockRec(x,y-1);
+				if (mat_arr[x+1][y].val == 0)  setBlankAsDeadblockRec(x+1,y);
+				if (mat_arr[x][y+1].val == 0)  setBlankAsDeadblockRec(x,y+1);
+			}
+	}
+	return(queue)
+}
+
+
+
+
+
+</script>
+
+
+
+	
+	
+</body>
+</html>
